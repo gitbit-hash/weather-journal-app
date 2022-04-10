@@ -33,3 +33,9 @@ app.listen(port, () => {
 app.get('/weather', (req, res) => {
 	return res.send(projectData);
 });
+
+app.post('/weather', (req, res) => {
+	const { temperature, date, userResponse } = req.body;
+	projectData = { temperature, date, userResponse };
+	res.send(projectData);
+});

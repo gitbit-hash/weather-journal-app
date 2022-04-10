@@ -15,9 +15,39 @@ const getWeather = async (countryCode = '', zip = '') => {
 		//Transform into json
 		const data = await res.json();
 
-		console.log(data);
+		return data;
 	} catch (error) {
 		console.log(error);
 	}
 };
-const weatherResponse = getWeather('us', 94040);
+
+const postData = async (url = '', data = {}) => {
+	const response = await fetch(url, {
+		method: 'POST',
+		credentials: 'same-origin',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(data),
+	});
+
+	try {
+		const newData = await response.json();
+
+		return newData;
+	} catch (error) {
+		console.log('error', error);
+	}
+};
+
+const getPostData = () => {
+	getWeather('us', 94040).then((data) => {
+		postData('http://localhost:3000/weather', {
+			temperature: data.main.temp,
+			date: newDate,
+			userResponse: 'Your feelings',
+		});
+	});
+};
+
+getPostData();
