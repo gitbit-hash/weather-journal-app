@@ -1,6 +1,7 @@
 /* Global Variables */
 const apiKey = '4b70fea52db751e99e5ba3673250f589&units=imperial';
 const baseURL = 'https://api.openweathermap.org/data/2.5';
+
 // Create a new date instance dynamically with JS
 let d = new Date();
 let newDate = `${d.getMonth()}.${d.getDate()}.${d.getFullYear()}`;
@@ -12,6 +13,9 @@ let newDate = `${d.getMonth()}.${d.getDate()}.${d.getFullYear()}`;
  * @param {string} apiKey
  * @returns Promise
  */
+
+let errorMessage = '';
+
 const getWeatherData = async (zip, baseURL, apiKey) => {
 	try {
 		// fetch openweathermap response
@@ -29,7 +33,7 @@ const getWeatherData = async (zip, baseURL, apiKey) => {
 
 		return data;
 	} catch (error) {
-		console.log(error.message);
+		errorMessage = error.message;
 	}
 };
 /**
@@ -57,32 +61,49 @@ const postData = async (url, data) => {
 	}
 };
 
+const zipInput = document.getElementById('zip');
+
+const errorElement = document.createElement('h3');
+
 /**
  *
  * @param {PointerEvent} e
  */
 const callback = async (e) => {
 	e.preventDefault();
-	console.log(e);
-	const zipInputValue = document.getElementById('zip').value;
+
 	const feelingsInputValue = document.getElementById('feelings').value;
 
+	const weatherData = await getWeatherData(zipInput.value, baseURL, apiKey);
+
 	try {
-		const weatherData = await getWeatherData(zipInputValue, baseURL, apiKey);
+		// If errorMessage is not empty, add error state
+		if (errorMessage) {
+			errorElement.innerHTML = errorMessage;
+			zipInput.classList.add('error');
+			zipInput.insertAdjacentElement('afterend', errorElement);
+		} else {
+			await postData('http://localhost:3000/all', {
+				temperature: weatherData.main.temp,
+				date: newDate,
+				userResponse: feelingsInputValue,
+			});
 
-		await postData('http://localhost:3000/all', {
-			temperature: weatherData.main.temp,
-			date: newDate,
-			userResponse: feelingsInputValue,
-		});
-
-		await retrieveData();
+			await retrieveData();
+		}
 	} catch (error) {
 		console.log(error);
 	}
 };
 
 document.getElementById('generate').addEventListener('click', callback);
+
+// Remove error states when zip input changes
+zipInput.addEventListener('keyup', () => {
+	errorMessage = '';
+	zipInput.classList.remove('error');
+	errorElement.innerText = '';
+});
 
 const retrieveData = async () => {
 	const request = await fetch('http://localhost:3000/all');

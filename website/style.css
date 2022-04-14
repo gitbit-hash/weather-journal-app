@@ -106,6 +106,19 @@ body {
 	padding: 0.5rem 1.5rem;
 }
 
+.error {
+	outline: 1px solid red;
+}
+
+.error:focus {
+	outline: 1px solid red;
+}
+
+h3 {
+	color: red;
+	margin: 0;
+}
+
 /*  Basic Styling To Override Default For Basic HTML Elements */
 label {
 	display: block;
